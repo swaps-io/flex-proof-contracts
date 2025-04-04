@@ -6,7 +6,8 @@ import {RlpEventLib} from "../../libraries/RlpEventLib.sol";
 
 import {IHashiEventVerifier} from "./interfaces/IHashiEventVerifier.sol";
 
-import {HashiProverLib, ReceiptProof} from "./libraries/prover/HashiProverLib.sol";
+import {HashiProverLib, ReceiptProof} from "./libraries/hashi/prover/HashiProverLib.sol";
+import {ReceiptProofLib} from "./libraries/ReceiptProofLib.sol";
 
 contract HashiEventVerifier is IHashiEventVerifier {
     address public immutable shoyuBashi;
@@ -22,8 +23,7 @@ contract HashiEventVerifier is IHashiEventVerifier {
         bytes calldata data_,
         bytes calldata proof_
     ) external view {
-        ReceiptProof calldata receiptProof;
-        assembly { receiptProof := proof_.offset } // TODO: adjust offset
+        ReceiptProof calldata receiptProof = ReceiptProofLib.decode(proof_);
         require(chain_ == receiptProof.chainId, ProofChainMismatch(chain_, receiptProof.chainId));
         bytes memory rlpEvent = RlpEventLib.encode(emitter_, topics_, data_);
         bytes memory proofRlpEvent = HashiProverLib.verifyForeignEvent(receiptProof, shoyuBashi);

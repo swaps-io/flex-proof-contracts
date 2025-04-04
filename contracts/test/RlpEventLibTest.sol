@@ -4,7 +4,7 @@ pragma solidity ^0.8.26;
 
 import {Test} from "forge-std/Test.sol";
 
-import {RlpEventLib} from "./RlpEventLib.sol";
+import {RlpEventLib} from "../libraries/RlpEventLib.sol";
 
 contract RlpEventLibTest is Test {
   function test_encodeKnownEvent() public pure {
@@ -31,7 +31,7 @@ contract RlpEventLibTest is Test {
     bytes memory data = '';
 
     bytes memory rlpEvent = RlpEventLib.encode(emitter, topics, data);
-    require(keccak256(rlpEvent) == 0x91e7296d9168806cdb2d6c65b61c00fd78904ec70dbc08acbe066f2d85beb2de);
+    require(keccak256(rlpEvent) == 0x91e7296d9168806cdb2d6c65b61c00fd78904ec70dbc08acbe066f2d85beb2de, "Bad keccak256(rlpEvent)");
   }
 
   function test_encodeEmptyEvent() public pure {
@@ -44,7 +44,7 @@ contract RlpEventLibTest is Test {
     // - Hash: 0xdbf77a9a53040e3812e90331d97fe28c8195c2ad9a71f0ce2f5aa0a76b5d43a2
 
     bytes memory rlpEvent = RlpEventLib.encode(emitter, topics, data);
-    require(keccak256(rlpEvent) == 0xdbf77a9a53040e3812e90331d97fe28c8195c2ad9a71f0ce2f5aa0a76b5d43a2);
+    require(keccak256(rlpEvent) == 0xdbf77a9a53040e3812e90331d97fe28c8195c2ad9a71f0ce2f5aa0a76b5d43a2, "Bad keccak256(rlpEvent)");
   }
 
   function test_encodeLargeEvent() public pure {
@@ -61,6 +61,6 @@ contract RlpEventLibTest is Test {
     // - Hash: 0xf4fa6fa23b0af9cac354b06be1e741c52bd186b8ad23217d9083aaf8c104c36a
 
     bytes memory rlpEvent = RlpEventLib.encode(emitter, topics, data);
-    require(keccak256(rlpEvent) == 0xf4fa6fa23b0af9cac354b06be1e741c52bd186b8ad23217d9083aaf8c104c36a);
+    require(keccak256(rlpEvent) == 0xf4fa6fa23b0af9cac354b06be1e741c52bd186b8ad23217d9083aaf8c104c36a, "Bad keccak256(rlpEvent)");
   }
 }
