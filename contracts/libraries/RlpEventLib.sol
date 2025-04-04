@@ -9,15 +9,19 @@ library RlpEventLib {
         address emitter_,
         bytes32[] memory topics_,
         bytes memory data_
-    ) internal pure returns (bytes memory rlpEvent) {
-        // TODO: implement RLP encoding of event
-        // rlpEvent = RLPWriter.writeList([
-        //     RLPWriter.writeAddress(emitter_),
-        //     RLPWriter.writeList([
-        //         RLPWriter.writeUint(topic)
-        //         for topic in topics_
-        //     ]),
-        //     RLPWriter.writeBytes(data_),
-        // ]);
+    ) internal pure returns (bytes memory) {
+        bytes[] memory eventList = new bytes[](3);
+        eventList[0] = RLPWriter.writeAddress(emitter_);
+        eventList[1] = _writeBytes32List(topics_);
+        eventList[2] = RLPWriter.writeBytes(data_);
+        return RLPWriter.writeList(eventList);
+    }
+
+    function _writeBytes32List(bytes32[] memory items_) private pure returns (bytes memory) {
+        bytes[] memory itemList = new bytes[](items_.length);
+        for (uint256 i = 0; i < items_.length; i++) {
+            itemList[i] = RLPWriter.writeBytes(abi.encode(items_[i]));
+        }
+        return RLPWriter.writeList(itemList);
     }
 }
