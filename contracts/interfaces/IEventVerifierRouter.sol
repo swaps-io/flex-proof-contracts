@@ -12,6 +12,7 @@ interface IEventVerifierRouter is IEventVerifier {
 
     event ChainRouterUpdate(uint256 indexed chain, address oldRouter, address newRouter);
     event ChainVariantProviderUpdate(uint256 indexed chain, uint256 indexed variant, address oldProvider, address newProvider);
+    event EventVerify(bytes32 indexed eventHash);
 
     function chainRouter(uint256 chain) external view returns (address);
 
