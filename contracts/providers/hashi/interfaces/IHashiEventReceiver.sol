@@ -2,10 +2,8 @@
 
 pragma solidity ^0.8.26;
 
-import {IJushin} from "../libraries/hashi/interfaces/IJushin.sol";
+import {IHashiEventReceiverInfra} from "./IHashiEventReceiverInfra.sol";
 
-import {IEventVerifier} from "../../../interfaces/IEventVerifier.sol";
-
-interface IHashiEventReceiver is IJushin, IEventVerifier {
-    function yaro() external view returns (address);
+interface IHashiEventReceiver is IHashiEventReceiverInfra {
+    function eventHashReceived(bytes32 eventHash) external view returns (bool);
 }

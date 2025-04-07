@@ -7,7 +7,7 @@ import {IYaho, IReporter, IAdapter} from "./libraries/hashi/interfaces/IYaho.sol
 import {IHashiEventSenderInfra} from "./interfaces/IHashiEventSenderInfra.sol";
 import {HashiEventSenderInfraConfig} from "./interfaces/HashiEventSenderInfraConfig.sol";
 
-abstract contract HashiEventSenderInfra is IHashiEventSenderInfra {
+contract HashiEventSenderInfra is IHashiEventSenderInfra {
     address public immutable eventVerifier;
     uint256 public immutable receiveChain;
     address public immutable eventReceiver;

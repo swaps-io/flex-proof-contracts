@@ -2,37 +2,17 @@
 
 pragma solidity ^0.8.26;
 
-import {IAdapter} from "./libraries/hashi/interfaces/IAdapter.sol";
-
 import {IHashiEventReceiver} from "./interfaces/IHashiEventReceiver.sol";
 
-contract HashiEventReceiver is IHashiEventReceiver {
-    address public immutable yaro;
+import {HashiEventReceiverInfra, HashiEventReceiverInfraConfig} from "./HashiEventReceiverInfra.sol";
 
-    constructor(
-        address yaro_
-    ) {
-        yaro = yaro_;
-    }
+contract HashiEventReceiver is IHashiEventReceiver, HashiEventReceiverInfra {
+    mapping(bytes32 eventHash => bool) public eventHashReceived;
 
-    function onMessage(
-        uint256 messageId_,
-        uint256 sourceChainId_,
-        address sender_,
-        uint256 threshold_,
-        IAdapter[] calldata adapters_,
-        bytes calldata data_
-    ) external returns (bytes memory) {
-        // TODO: implement message handling from Yaro
-    }
+    constructor(HashiEventReceiverInfraConfig memory config_)
+        HashiEventReceiverInfra(config_) {}
 
-    function verifyEvent(
-        uint256 chain_,
-        address emitter_,
-        bytes32[] calldata topics_,
-        bytes calldata data_,
-        bytes calldata proof_
-    ) external {
-        // TODO: implement event verification
+    function _receiveHashMessage(bytes32 hash_) internal override {
+        eventHashReceived[hash_] = true;
     }
 }
