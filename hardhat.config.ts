@@ -27,7 +27,7 @@ const config: HardhatUserConfig = {
       },
     },
     remappings: [
-      'forge-std/=npm/forge-std@1.9.4/src/',
+      'forge-std/=npm/forge-std@1.9.6/src/',
     ],
   },
   networks: {

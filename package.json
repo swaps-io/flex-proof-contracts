@@ -15,10 +15,10 @@
     "@nomicfoundation/hardhat-node-test-runner": "^3.0.0-next.3",
     "@nomicfoundation/hardhat-viem": "^3.0.0-next.3",
     "@types/node": "^22.14.0",
-    "forge-std": "github:foundry-rs/forge-std#v1.9.4",
+    "forge-std": "github:foundry-rs/forge-std#v1.9.6",
     "hardhat": "^3.0.0-next.3",
-    "typescript": "~5.5.0",
-    "viem": "^2.25.0"
+    "typescript": "~5.8.3",
+    "viem": "^2.26.0"
   },
   "dependencies": {
     "@eth-optimism/contracts-bedrock": "patch:@eth-optimism/contracts-bedrock@npm%3A0.17.3#~/patches/@eth-optimism-contracts-bedrock-npm-0.17.3-e7ff7d2c90.patch",
