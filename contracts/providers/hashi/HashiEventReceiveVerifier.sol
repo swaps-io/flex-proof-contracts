@@ -22,6 +22,6 @@ contract HashiEventReceiveVerifier is IHashiEventReceiveVerifier {
         bytes calldata /* proof_ */
     ) external view {
         bytes32 eventHash = EventHashLib.calc(chain_, emitter_, topics_, data_);
-        require(IHashiEventReceiver(eventReceiver).eventHashReceived(eventHash), EventNotReceived(eventHash));
+        require(IHashiEventReceiver(eventReceiver).eventHashReceived(eventHash), EventHashNotReceived(eventHash));
     }
 }
