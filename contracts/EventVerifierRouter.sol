@@ -35,7 +35,6 @@ contract EventVerifierRouter is IEventVerifierRouter, Ownable2Step {
         emit ChainVariantProviderUpdate(chain_, variant_, oldProvider, provider_);
     }
 
-    // TODO: storage save functionality (?)
     function verifyEvent(
         uint256 chain_,
         address emitter_,
