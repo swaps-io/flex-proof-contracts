@@ -2,9 +2,23 @@
 
 pragma solidity ^0.8.26;
 
-import {IHashiEventSenderInfra} from "./IHashiEventSenderInfra.sol";
+import {HashiBatchEvent, HashiBatchEventNoChain, HashiBatchEventNoChainEmitter} from "./HashiBatchEvent.sol";
 
-interface IHashiEventSender is IHashiEventSenderInfra {
+interface IHashiEventSender {
+    function eventVerifier() external view returns (address);
+
+    function receiveChain() external view returns (uint256);
+
+    function eventReceiver() external view returns (address);
+
+    function yaho() external view returns (address);
+
+    function threshold() external view returns (uint256);
+
+    function reporters() external view returns (address[] memory);
+
+    function adapters() external view returns (address[] memory);
+
     function sendEvent(
         uint256 chain,
         address emitter,
@@ -12,4 +26,10 @@ interface IHashiEventSender is IHashiEventSenderInfra {
         bytes calldata data,
         bytes calldata proof
     ) external;
+
+    function sendEventBatch(HashiBatchEvent[] calldata events) external;
+
+    function sendEventBatch(uint256 chain, HashiBatchEventNoChain[] calldata events) external;
+
+    function sendEventBatch(uint256 chain, address emitter, HashiBatchEventNoChainEmitter[] calldata events) external;
 }
