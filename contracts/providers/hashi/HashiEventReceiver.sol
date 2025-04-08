@@ -37,13 +37,13 @@ contract HashiEventReceiver is IHashiEventReceiver {
         IAdapter[] calldata adapters_,
         bytes calldata data_
     ) external returns (bytes memory) {
-        // TODO: use custom errors
-        require(msg.sender == yaru, "only called by Yaru");
-        require(sourceChainId_ == sendChain, "invalid source chain ID");
-        require(sender_ == eventSender, "invalid sender address from source chain");
-        require(threshold_ == threshold, "invalid number of threshold");
-        require(_calcAdaptersHash(_asAddresses(adapters_)) == adaptersHash, "invalid adapters hash");
-        require(data_.length == 32, "invalid data length");
+        require(msg.sender == yaru, MessageCallerMismatch(yaru, msg.sender));
+        require(sourceChainId_ == sendChain, MessageChainMismatch(sendChain, sourceChainId_));
+        require(sender_ == eventSender, MessageSenderMismatch(eventSender, sender_));
+        require(threshold_ == threshold, MessageThresholdMismatch(threshold, threshold_));
+        bytes32 msgAdaptersHash = _calcAdaptersHash(_asAddresses(adapters_));
+        require(msgAdaptersHash == adaptersHash, MessageAdaptersMismatch(adaptersHash, msgAdaptersHash));
+        require(data_.length == 32, MessageLengthMismatch(32, data_.length));
 
         bytes32 hash = bytes32(data_[0:32]);
         eventHashReceived[hash] = true;
