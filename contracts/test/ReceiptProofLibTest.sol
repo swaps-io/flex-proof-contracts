@@ -7,7 +7,7 @@ import {ReceiptProofLib, ReceiptProof} from "../providers/hashi/libraries/Receip
 contract ReceiptProofLibTest {
     function test_decodeKnownProof(bytes32, string calldata, uint256, bytes calldata proof_, bytes calldata, bytes8, uint8) public pure {
         // Special `proof_` fixture expected - see `test/ReceiptProofLibTest.ts`.
-        require(proof_.length == 4640, "Bad proof_.length");
+        require(proof_.length == 4608, "Bad proof_.length");
         ReceiptProof calldata receiptProof = ReceiptProofLib.decode(proof_);
         require(receiptProof.chainId == 10, "Bad receiptProof.chainId");
         require(receiptProof.blockNumber == 127308333, "Bad receiptProof.blockNumber");

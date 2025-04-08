@@ -6,6 +6,6 @@ import {HashiBatchReceiveProof} from "../interfaces/HashiBatchReceiveProof.sol";
 
 library HashiBatchReceiveProofLib {
     function decode(bytes calldata proof_) internal pure returns (HashiBatchReceiveProof calldata batchReceiveProof) {
-        assembly { batchReceiveProof := add(proof_.offset, 32) }
+        assembly { batchReceiveProof := proof_.offset }
     }
 }

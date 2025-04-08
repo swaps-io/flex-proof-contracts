@@ -6,12 +6,12 @@ import {RouterProof} from "../interfaces/RouterProof.sol";
 
 library RouterProofLib {
     function decode(bytes calldata proof_) internal pure returns (RouterProof calldata routerProof) {
-        assembly { routerProof := add(proof_.offset, 32) }
+        assembly { routerProof := proof_.offset }
     }
 
     function consume(bytes calldata proof_) internal pure returns (bytes memory) {
         RouterProof calldata routerProof = decode(proof_);
-        uint256 size = (2 + routerProof.relayChains.length) * 32;
+        uint256 size = (3 + routerProof.relayChains.length) * 32; // 3: `variant`, `relayChains` offset, `relayChains` length
         return proof_[size:];
     }
 }

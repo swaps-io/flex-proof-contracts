@@ -6,6 +6,6 @@ import {ReceiptProof} from "./hashi/prover/HashiProverStructs.sol";
 
 library ReceiptProofLib {
     function decode(bytes calldata proof_) internal pure returns (ReceiptProof calldata receiptProof) {
-        assembly { receiptProof := add(proof_.offset, 32) }
+        assembly { receiptProof := proof_.offset }
     }
 }
