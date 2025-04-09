@@ -5,8 +5,8 @@ export interface EncodeSaveEventProofParams {
   save?: boolean;
 }
 
-export const encodeSaveEventProof = (params: EncodeSaveEventProofParams): Hex => {
-  const proofStruct = encodeAbiParameters(
+export const encodeSaveEventProof = (params: EncodeSaveEventProofParams = {}): Hex => {
+  const proof = encodeAbiParameters(
     parseAbiParameters([
       'SaveEventProof',
       'struct SaveEventProof { uint256 flags; }',
@@ -17,6 +17,5 @@ export const encodeSaveEventProof = (params: EncodeSaveEventProofParams): Hex =>
       },
     ],
   );
-  const proof = sliceHex(proofStruct, 32);
   return proof;
 };

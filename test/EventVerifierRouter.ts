@@ -9,6 +9,7 @@ import { joinProofs } from './lib/joinProofs.js';
 import { encodeRouterProof } from './lib/encodeRouterProof.js';
 import { asHex } from './lib/hex.js';
 import { encodeReceiptProof } from './lib/encodeReceiptProof.js';
+import { encodeSaveEventProof } from './lib/encodeSaveEventProof.js';
 
 describe('EventVerifierRouter', async function () {
   const { viem } = await network.connect();
@@ -139,6 +140,47 @@ describe('EventVerifierRouter', async function () {
     const eventHash = calcEventHash(chain, emitter, topics, data);
 
     const proof = joinProofs([
+      encodeRouterProof({ variant: 300n }),
+    ]);
+
+    {
+      const hash = await test.write.verifyEvent([
+        chain, // chain
+        emitter, // emitter
+        topics, // topics
+        data, // data
+        proof, // proof
+      ]);
+
+      const receipt = await publicClient.getTransactionReceipt({ hash });
+      console.log(`Gas used: ${receipt.gasUsed}`);
+
+      const logs = parseEventLogs({
+        abi: test.abi,
+        logs: receipt.logs,
+        eventName: 'EventVerifyTest',
+        args: {
+          eventHash,
+        },
+      });
+      assert.equal(logs.length, 1);
+    }
+  });
+
+  it('Should verify event using save & self', async function () {
+    const chain = thisChain;
+    const emitter = selfVerifier.address;
+    const topics = [
+      keccak256(stringToBytes('ExpectedEvent(uint256)')),
+      asHex(133713371337n, 32),
+    ];
+    const data = stringToHex('test-event-data');
+
+    const eventHash = calcEventHash(chain, emitter, topics, data);
+
+    const proof = joinProofs([
+      encodeRouterProof({ variant: 400n }),
+      encodeSaveEventProof({ verify: true, save: true }),
       encodeRouterProof({ variant: 300n }),
     ]);
 
