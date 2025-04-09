@@ -26,7 +26,7 @@ describe('EventHashLibTest', async function () {
     assert.equal(hash, '0x6ba22fad9f9be89da32392d1df40f5a0b82c430085752d2894944be5eaac310c');
   });
 
-  it('Should match offline hash calc', async function () {
+  it('Should match offline event hash calc', async function () {
     const hash = calcEventHash(
       13371337133713371337n, // chain
       '0x4242424242424242424242424242424242424242', // emitter

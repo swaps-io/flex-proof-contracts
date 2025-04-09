@@ -10,6 +10,9 @@ import { encodeRouterProof } from './lib/encodeRouterProof.js';
 import { asHex } from './lib/hex.js';
 import { encodeReceiptProof } from './lib/encodeReceiptProof.js';
 import { encodeSaveEventProof } from './lib/encodeSaveEventProof.js';
+import { encodeHashiReceiveProof } from './lib/encodeHashiReceiveProof.js';
+import { encodeHashiBatchReceiveProof } from './lib/encodeHashiBatchReceiveProof.js';
+import { calcEventsHash } from './lib/calcEventsHash.js';
 
 describe('EventVerifierRouter', async function () {
   const { viem } = await network.connect();
@@ -27,10 +30,10 @@ describe('EventVerifierRouter', async function () {
     shoyuBashi.address, // shoyuBashi
   ]);
 
-  // Hashi message receive verification [#200, #201]
+  // Hashi message receive verification [#101, #102]
   const yaru = await viem.deployContract('YaruTest');
   const hashiReceiver = await viem.deployContract('HashiEventReceiver', [
-    thisChain, // sendChain
+    10n, // sendChain
     '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef', // eventSender
     yaru.address, // yaru
     2n, // threshold
@@ -47,18 +50,18 @@ describe('EventVerifierRouter', async function () {
     hashiReceiver.address, // eventReceiver
   ]);
 
-  // Self verification [#300]
+  // Self verification [#103]
   const selfVerifier = await viem.deployContract('SelfEventVerifierTest', []);
 
-  // Save verification [#400]
+  // Save verification [#104]
   const saveVerifier = await viem.deployContract('SaveEventVerifier', [router.address]);
 
   // Router setup
   await router.write.setChainVariantProvider([10n, 100n, hashiVerifier.address]);
-  await router.write.setChainVariantProvider([thisChain, 200n, hashiReceiveVerifier.address]);
-  await router.write.setChainVariantProvider([thisChain, 201n, hashiBatchReceiveVerifier.address]);
-  await router.write.setChainVariantProvider([thisChain, 300n, selfVerifier.address]);
-  await router.write.setChainVariantProvider([thisChain, 400n, saveVerifier.address]);
+  await router.write.setChainVariantProvider([10n, 101n, hashiReceiveVerifier.address]);
+  await router.write.setChainVariantProvider([10n, 102n, hashiBatchReceiveVerifier.address]);
+  await router.write.setChainVariantProvider([thisChain, 103n, selfVerifier.address]);
+  await router.write.setChainVariantProvider([thisChain, 104n, saveVerifier.address]);
 
   // Verifier test
   const test = await viem.deployContract('EventVerifierTest', [router.address]);
@@ -106,11 +109,140 @@ describe('EventVerifierRouter', async function () {
 
     {
       const hash = await test.write.verifyEvent([
-        chain, // chain
-        emitter, // emitter
-        topics, // topics
-        data, // data
-        proof, // proof
+        chain,
+        emitter,
+        topics,
+        data,
+        proof,
+      ]);
+
+      const receipt = await publicClient.getTransactionReceipt({ hash });
+      console.log(`Gas used: ${receipt.gasUsed}`);
+
+      const logs = parseEventLogs({
+        abi: test.abi,
+        logs: receipt.logs,
+        eventName: 'EventVerifyTest',
+        args: {
+          eventHash,
+        },
+      });
+      assert.equal(logs.length, 1);
+    }
+  });
+
+  it('Should verify event using Hashi receive', async function () {
+    // Based on:
+    // - https://optimistic.etherscan.io/tx/0x218e42d1f4231e56f87e97fcdb8d1a503cb7991eee663c5b4987e23ac741277f#eventlog#87
+
+    const chain = 10n;
+    const emitter = '0xb981b2c0C3DB52C316d30df76Cc48fD167Ed87eD';
+    const topics = [
+      keccak256(stringToBytes('EnabledModule(address)')),
+      asHex('0x75cf11467937ce3F2f357CE24ffc3DBF8fD5c226', 32),
+    ];
+    const data = '0x';
+
+    const eventHash = calcEventHash(chain, emitter, topics, data);
+
+    const proof = joinProofs([
+      encodeRouterProof({ variant: 101n }),
+      encodeHashiReceiveProof(),
+    ]);
+
+    // Emulate receive
+    await yaru.write.callJushin([
+      hashiReceiver.address, // jushin
+      123n, // messageId
+      10n, // sourceChainId
+      '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef', // sender
+      2n, // threshold
+      [ // adapters
+        '0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1',
+        '0xa2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2',
+        '0xa3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3',
+      ],
+      eventHash, // data
+    ]);
+
+    {
+      const hash = await test.write.verifyEvent([
+        chain,
+        emitter,
+        topics,
+        data,
+        proof,
+      ]);
+
+      const receipt = await publicClient.getTransactionReceipt({ hash });
+      console.log(`Gas used: ${receipt.gasUsed}`);
+
+      const logs = parseEventLogs({
+        abi: test.abi,
+        logs: receipt.logs,
+        eventName: 'EventVerifyTest',
+        args: {
+          eventHash,
+        },
+      });
+      assert.equal(logs.length, 1);
+    }
+  });
+
+  it('Should verify event using Hashi batch receive', async function () {
+    // Based on:
+    // - https://optimistic.etherscan.io/tx/0x218e42d1f4231e56f87e97fcdb8d1a503cb7991eee663c5b4987e23ac741277f#eventlog#87
+
+    const chain = 10n;
+    const emitter = '0xb981b2c0C3DB52C316d30df76Cc48fD167Ed87eD';
+    const topics = [
+      keccak256(stringToBytes('EnabledModule(address)')),
+      asHex('0x75cf11467937ce3F2f357CE24ffc3DBF8fD5c226', 32),
+    ];
+    const data = '0x';
+
+    const eventHash = calcEventHash(chain, emitter, topics, data);
+
+    const eventHashes = [
+      '0x60d40489eb54f749d1173907e28339d167c98ec029f440832be95a69846220e5',
+      '0x58ce77cad226433cedd73c238b356f2d0671b5364f0fe8e07ffb37e9f087cd85',
+      eventHash, // At `eventIndex`
+      '0xa81e46a5f472258c8fcd1b34828c635bb708f51d25d760cd6f95b624b9d17a32',
+      '0x43c9a5d635e874f9d308ed1ce42ba036d0392044c892531a99ca57c803430c1c',
+      '0x82cfebc746a4609e989a924ff56320f66f97aa47a790b05b7ab80f737fd772ac',
+      '0x388b5332e861875a9f88e44106c560bba63dcadcc3bc644f46813f459692da39',
+    ];
+    const eventIndex = 2;
+
+    const eventsHash = calcEventsHash(eventHashes);
+
+    const proof = joinProofs([
+      encodeRouterProof({ variant: 102n }),
+      encodeHashiBatchReceiveProof({ eventHashes, eventIndex }),
+    ]);
+
+    // Emulate batch receive
+    await yaru.write.callJushin([
+      hashiReceiver.address, // jushin
+      123n, // messageId
+      10n, // sourceChainId
+      '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef', // sender
+      2n, // threshold
+      [ // adapters
+        '0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1',
+        '0xa2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2',
+        '0xa3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3',
+      ],
+      eventsHash, // data
+    ]);
+
+    {
+      const hash = await test.write.verifyEvent([
+        chain,
+        emitter,
+        topics,
+        data,
+        proof,
       ]);
 
       const receipt = await publicClient.getTransactionReceipt({ hash });
@@ -140,16 +272,16 @@ describe('EventVerifierRouter', async function () {
     const eventHash = calcEventHash(chain, emitter, topics, data);
 
     const proof = joinProofs([
-      encodeRouterProof({ variant: 300n }),
+      encodeRouterProof({ variant: 103n }),
     ]);
 
     {
       const hash = await test.write.verifyEvent([
-        chain, // chain
-        emitter, // emitter
-        topics, // topics
-        data, // data
-        proof, // proof
+        chain,
+        emitter,
+        topics,
+        data,
+        proof,
       ]);
 
       const receipt = await publicClient.getTransactionReceipt({ hash });
@@ -179,18 +311,18 @@ describe('EventVerifierRouter', async function () {
     const eventHash = calcEventHash(chain, emitter, topics, data);
 
     const proof = joinProofs([
-      encodeRouterProof({ variant: 400n }),
+      encodeRouterProof({ variant: 104n }),
       encodeSaveEventProof({ verify: true, save: true }),
-      encodeRouterProof({ variant: 300n }),
+      encodeRouterProof({ variant: 103n }),
     ]);
 
     {
       const hash = await test.write.verifyEvent([
-        chain, // chain
-        emitter, // emitter
-        topics, // topics
-        data, // data
-        proof, // proof
+        chain,
+        emitter,
+        topics,
+        data,
+        proof,
       ]);
 
       const receipt = await publicClient.getTransactionReceipt({ hash });
