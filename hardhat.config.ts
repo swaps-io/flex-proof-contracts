@@ -1,4 +1,4 @@
-import { HardhatUserConfig, configVariable } from 'hardhat/config';
+import { HardhatUserConfig } from 'hardhat/config';
 
 import HardhatNodeTestRunner from '@nomicfoundation/hardhat-node-test-runner';
 import HardhatViem from '@nomicfoundation/hardhat-viem';
@@ -21,7 +21,7 @@ const config: HardhatUserConfig = {
         settings: {
           optimizer: {
             enabled: true,
-            runs: 200,
+            runs: 1_000_000,
           },
         },
       },
@@ -38,12 +38,6 @@ const config: HardhatUserConfig = {
     hardhatOp: {
       type: 'edr',
       chainType: 'optimism',
-    },
-    sepolia: {
-      type: 'http',
-      chainType: 'l1',
-      url: configVariable('SEPOLIA_RPC_URL'),
-      accounts: [configVariable('SEPOLIA_PRIVATE_KEY')],
     },
   },
 };
