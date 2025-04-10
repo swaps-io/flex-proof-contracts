@@ -29,22 +29,36 @@ contract ShoyuBashiFossil is IShoyuBashiFossil {
         for (uint256 i = 0; i < totalAdapters; i++) {
             hashes[i] = IAdapter(_adapters[i]).getHash(domain_, id_);
         }
+        return _findThresholdHash(hashes);
+    }
 
-        // Threshold check is based on `ShuSo._getThresholdHash` implementation
+    function _findThresholdHash(bytes32[] memory hashes_) private view returns (bytes32) {
+        bytes32 maxHash = bytes32(0);
+        uint256 maxCount = 0;
+        bool maxAmbiguous = false;
         for (uint256 i = 0; i < totalAdapters; i++) {
-            if (i > totalAdapters - threshold) break;
+            bytes32 hash = hashes_[i];
+            if (hash == bytes32(0) || hash == maxHash) {
+                continue;
+            }
 
-            bytes32 baseHash = hashes[i];
-            if (baseHash == bytes32(0)) continue;
-
-            uint256 num = 0;
-            for (uint256 j = i; j < totalAdapters; j++) {
-                if (baseHash == hashes[j]) {
-                    num++;
-                    if (num == threshold) return hashes[i];
+            uint256 count = 0;
+            for (uint256 j = 0; j < totalAdapters; j++) {
+                if (hashes_[j] == hash) {
+                    count++;
                 }
             }
+
+            if (count > maxCount) {
+                maxHash = hash;
+                maxCount = count;
+                maxAmbiguous = false;
+            } else if (count == maxCount) {
+                maxAmbiguous = true;
+            }
         }
-        revert ThresholdNotMet();
+
+        require(maxCount >= threshold && !maxAmbiguous, ThresholdNotMet());
+        return maxHash;
     }
 }
