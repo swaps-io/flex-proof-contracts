@@ -8,12 +8,13 @@ import { calcEventHash } from './lib/calcEventHash.js';
 import { joinProofs } from './lib/joinProofs.js';
 import { encodeRouterProof } from './lib/encodeRouterProof.js';
 import { asHex } from './lib/hex.js';
-import { encodeReceiptProof } from './lib/encodeReceiptProof.js';
-import { encodeSaveEventProof } from './lib/encodeSaveEventProof.js';
-import { encodeHashiReceiveProof } from './lib/encodeHashiReceiveProof.js';
-import { encodeHashiBatchReceiveProof } from './lib/encodeHashiBatchReceiveProof.js';
+import { encodeHashiReceiptProof } from './lib/encodeHashiReceiptProof.js';
+import { encodeHashiMessageProof } from './lib/encodeHashiMessageProof.js';
 import { calcEventsHash } from './lib/calcEventsHash.js';
 import { EVENT_VERIFY_SIGNATURE } from './lib/eventVerifySignature.js';
+import { calcHashiMessageHash } from './lib/calcHashiMessageHash.js';
+import { encodeHashiMessage } from './lib/encodeHashiMessage.js';
+import { calcHashiMessageId } from './lib/calcHashiMessageId.js';
 
 describe('EventVerifierRouter', async function () {
   const { viem } = await network.connect();
@@ -26,39 +27,41 @@ describe('EventVerifierRouter', async function () {
   const router = await viem.deployContract('EventVerifierRouter', [routerOwner]);
 
   // Hashi block header verification [#100]
-  const shoyuBashi = await viem.deployContract('ShoyuBashiTest');
-  const hashiVerifier = await viem.deployContract('HashiEventVerifier', [
+  const lightClient = await viem.deployContract('LightClientTest');
+  const shoyuBashi = await viem.deployContract('HashiLightClientShoyuBashi', [10n, lightClient.address]);
+  const receiptVerifier = await viem.deployContract('HashiReceiptEventVerifier', [
     shoyuBashi.address, // shoyuBashi
   ]);
 
-  // Hashi message receive verification [#101, #102]
-  const yaru = await viem.deployContract('YaruTest');
-  const hashiReceiver = await viem.deployContract('HashiEventReceiver', [
-    10n, // sendChain
-    '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef', // eventSender
-    yaru.address, // yaru
+  // Hashi message receive verification [#101]
+  const hashi = await viem.deployContract('HashiTest');
+  const reporters = [
+    '0x0011001100110011001100110011001100110011',
+    '0x0022002200220022002200220022002200220022',
+    '0x0033003300330033003300330033003300330033',
+  ];
+  const adapters = [
+    await viem.deployContract('AdapterTest'),
+    await viem.deployContract('AdapterTest'),
+    await viem.deployContract('AdapterTest'),
+  ];
+  assert.equal(adapters.length, reporters.length);
+  const messageVerifier = await viem.deployContract('HashiMessageEventVerifier', [
+    10n, // chain
+    '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef', // sender
+    '0xbeef0000dead0000beef0000dead0000beef0000', // yaho
+    hashi.address, // hashi
     2n, // threshold
-    [ // adapters
-      '0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1',
-      '0xa2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2',
-      '0xa3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3',
-    ],
-  ]);
-  const hashiReceiveVerifier = await viem.deployContract('HashiEventReceiveVerifier', [
-    hashiReceiver.address, // eventReceiver
-  ]);
-  const hashiBatchReceiveVerifier = await viem.deployContract('HashiBatchEventReceiveVerifier', [
-    hashiReceiver.address, // eventReceiver
+    adapters.map((a) => a.address), // adapters
   ]);
 
   // Self verification
   const selfVerifier = await viem.deployContract('SelfEventVerifierTest', []);
 
   // Router setup
-  await router.write.setChainVariantProvider([10n, 100n, hashiVerifier.address]);
-  await router.write.setChainVariantProvider([10n, 101n, hashiReceiveVerifier.address]);
-  await router.write.setChainVariantProvider([10n, 102n, hashiBatchReceiveVerifier.address]);
-  await router.write.setChainVariantProvider([4321n, 101n, hashiReceiveVerifier.address]);
+  await router.write.setChainVariantProvider([10n, 100n, receiptVerifier.address]);
+  await router.write.setChainVariantProvider([10n, 101n, messageVerifier.address]);
+  await router.write.setChainVariantProvider([4321n, 101n, messageVerifier.address]);
   await router.write.setChainRouter([4321n, '0xe0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0']);
 
   // Verifier test
@@ -78,11 +81,11 @@ describe('EventVerifierRouter', async function () {
     ];
     const data = '0x';
 
-    const eventHash = calcEventHash(chain, emitter, topics, data);
+    const eventHash = calcEventHash({ chain, emitter, topics, data });
 
     const proof = joinProofs([
       encodeRouterProof({ variant: 100n }),
-      encodeReceiptProof({
+      encodeHashiReceiptProof({
         chainId: 10n,
         blockNumber: 127308333n,
         blockHeader: '0xf90244a0f9ff0f83514b39d941c5b84e2f4f34b92e766bdc61de08a76dc9b14a71e73222a01dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347944200000000000000000000000000000000000011a0f1b09fb679e6b75e3169883ee999c4e4d3cd4bf95c6572e00ce730a2b732d711a02869278b132da65669ef8dd5a59e1cafb19432e63dd89b53ea61212d97cced4ea03204fb2c7f9acb8cf2af0c7feeff761af2e86b687b42118a458a9810472ab2a7b90100125b78c6f047983080c109c20003600080822088020460090f1ce4046c88533b0d0808083704d04840000072020c3324a15d404152906612503801016a6342cd0c40114c25c820cab225122d4054688a52a884101149061e116482455810080108a9030b62168280154002410082189003201c05237886e405451816294c4018cd24850788000608e011834c88001a281941b606cc3009402834280c0e804c1082108360108598ca8010614a111404202ed102208548408e00d0800018084124c230307608028494aa2903a60443410d90c0719000d4a3090102008e022060a603386ca14471050e298480116802316262182014708880488002b240005501e880840796922d840393870084018c3555846720fe1380a0be75f63a0e2efb12310fb91829a5b2252a882e508a674d7cb8c72eccb62a415688000000000000000082017ca056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b4218080a0f0c257dfdcaf31ff962d00afaf90878fc0d01699b610ae334650a942eb716de0',
@@ -99,10 +102,9 @@ describe('EventVerifierRouter', async function () {
     ]);
 
     // Enable block
-    await shoyuBashi.write.setThresholdHash([
-      10n, // domain
-      127308333n, // id
-      '0x4a95d1ff4f70678c282ef4c88aee8627798dc6957726bb27b16bf206875b5b7e', // hash
+    await lightClient.write.setHeader([
+      127308333n,
+      '0x4a95d1ff4f70678c282ef4c88aee8627798dc6957726bb27b16bf206875b5b7e',
     ]);
 
     {
@@ -129,7 +131,7 @@ describe('EventVerifierRouter', async function () {
     }
   });
 
-  it('Should verify event using Hashi receive', async function () {
+  it('Should verify event using Hashi message', async function () {
     // Based on:
     // - https://optimistic.etherscan.io/tx/0x218e42d1f4231e56f87e97fcdb8d1a503cb7991eee663c5b4987e23ac741277f#eventlog#87
 
@@ -141,27 +143,43 @@ describe('EventVerifierRouter', async function () {
     ];
     const data = '0x';
 
-    const eventHash = calcEventHash(chain, emitter, topics, data);
+    const eventHash = calcEventHash({ chain, emitter, topics, data });
 
     const proof = joinProofs([
       encodeRouterProof({ variant: 101n }),
-      encodeHashiReceiveProof(),
+      encodeHashiMessageProof({
+        nonce: 444_555_111n,
+        adapters: adapters.map((a) => a.address),
+        reporters,
+      }),
     ]);
 
     // Emulate receive
-    await yaru.write.callJushin([
-      hashiReceiver.address, // jushin
-      123n, // messageId
-      10n, // sourceChainId
-      '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef', // sender
-      2n, // threshold
-      [ // adapters
-        '0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1',
-        '0xa2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2',
-        '0xa3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3',
-      ],
-      eventHash, // data
-    ]);
+    {
+      const message = encodeHashiMessage({
+        nonce: 9090909090n,
+        targetChainId: thisChain,
+        threshold: 2n,
+        sender: '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
+        receiver: messageVerifier.address,
+        data: eventHash,
+        reporters,
+        adapters: adapters.map((a) => a.address),
+      });
+      const messageHash = calcHashiMessageHash({ message });
+      const messageId = calcHashiMessageId({
+        sourceChainId: 10n,
+        dispatcherAddress: '0xbeef0000dead0000beef0000dead0000beef0000',
+        messageHash,
+      });
+      for (const adapter of [adapters[0], adapters[2]]) {
+        await adapter.write.setHash([
+          10n,
+          BigInt(messageId),
+          messageHash,
+        ]);
+      }
+    }
 
     {
       const hash = await test.write.verifyEvent([
@@ -187,7 +205,7 @@ describe('EventVerifierRouter', async function () {
     }
   });
 
-  it('Should verify event using Hashi batch receive', async function () {
+  it('Should verify event using Hashi batch message', async function () {
     // Based on:
     // - https://optimistic.etherscan.io/tx/0x218e42d1f4231e56f87e97fcdb8d1a503cb7991eee663c5b4987e23ac741277f#eventlog#87
 
@@ -199,7 +217,7 @@ describe('EventVerifierRouter', async function () {
     ];
     const data = '0x';
 
-    const eventHash = calcEventHash(chain, emitter, topics, data);
+    const eventHash = calcEventHash({ chain, emitter, topics, data });
 
     const eventHashes = [
       '0x60d40489eb54f749d1173907e28339d167c98ec029f440832be95a69846220e5',
@@ -212,27 +230,45 @@ describe('EventVerifierRouter', async function () {
     ];
     const eventIndex = 2;
 
-    const eventsHash = calcEventsHash(eventHashes);
+    const eventsHash = calcEventsHash({ eventHashes });
 
     const proof = joinProofs([
-      encodeRouterProof({ variant: 102n }),
-      encodeHashiBatchReceiveProof({ eventHashes, eventIndex }),
+      encodeRouterProof({ variant: 101n }),
+      encodeHashiMessageProof({
+        batchHashes: eventHashes,
+        batchIndex: eventIndex,
+        nonce: 444_555_111n,
+        adapters: adapters.map((a) => a.address),
+        reporters,
+      }),
     ]);
 
     // Emulate batch receive
-    await yaru.write.callJushin([
-      hashiReceiver.address, // jushin
-      123n, // messageId
-      10n, // sourceChainId
-      '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef', // sender
-      2n, // threshold
-      [ // adapters
-        '0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1',
-        '0xa2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2',
-        '0xa3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3',
-      ],
-      eventsHash, // data
-    ]);
+    {
+      const message = encodeHashiMessage({
+        nonce: 9090909090n,
+        targetChainId: thisChain,
+        threshold: 2n,
+        sender: '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
+        receiver: messageVerifier.address,
+        data: eventsHash,
+        reporters,
+        adapters: adapters.map((a) => a.address),
+      });
+      const messageHash = calcHashiMessageHash({ message });
+      const messageId = calcHashiMessageId({
+        sourceChainId: 10n,
+        dispatcherAddress: '0xbeef0000dead0000beef0000dead0000beef0000',
+        messageHash,
+      });
+      for (const adapter of [adapters[0], adapters[2]]) {
+        await adapter.write.setHash([
+          10n,
+          BigInt(messageId),
+          messageHash,
+        ]);
+      }
+    }
 
     {
       const hash = await test.write.verifyEvent([
@@ -267,7 +303,7 @@ describe('EventVerifierRouter', async function () {
     ];
     const data = stringToHex('test-event-data');
 
-    const eventHash = calcEventHash(chain, emitter, topics, data);
+    const eventHash = calcEventHash({ chain, emitter, topics, data });
 
     const proof = joinProofs([
       encodeRouterProof({ variant: 0n, emitterVerifier: true }),
@@ -306,36 +342,48 @@ describe('EventVerifierRouter', async function () {
     ];
     const data = stringToHex('test-event-data');
 
-    const eventHash = calcEventHash(chain, emitter, topics, data);
+    const eventHash = calcEventHash({ chain, emitter, topics, data });
 
     const proof = joinProofs([
       encodeRouterProof({ variant: 101n, relayChains: [4321n] }),
     ]);
 
-    const relayEventHash = calcEventHash(
-      4321n,
-      '0xe0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0',
-      [
+    const relayEventHash = calcEventHash({
+      chain: 4321n,
+      emitter: '0xe0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0',
+      topics: [
         EVENT_VERIFY_SIGNATURE,
         eventHash,
       ],
-      '0x',
-    );
+      data: '0x',
+    });
 
     // Emulate receive
-    await yaru.write.callJushin([
-      hashiReceiver.address, // jushin
-      123n, // messageId
-      10n, // sourceChainId
-      '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef', // sender
-      2n, // threshold
-      [ // adapters
-        '0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1',
-        '0xa2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2a2',
-        '0xa3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3a3',
-      ],
-      relayEventHash, // data
-    ]);
+    {
+      const message = encodeHashiMessage({
+        nonce: 9090909090n,
+        targetChainId: thisChain,
+        threshold: 2n,
+        sender: '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
+        receiver: messageVerifier.address,
+        data: relayEventHash,
+        reporters,
+        adapters: adapters.map((a) => a.address),
+      });
+      const messageHash = calcHashiMessageHash({ message });
+      const messageId = calcHashiMessageId({
+        sourceChainId: 10n,
+        dispatcherAddress: '0xbeef0000dead0000beef0000dead0000beef0000',
+        messageHash,
+      });
+      for (const adapter of [adapters[0], adapters[2]]) {
+        await adapter.write.setHash([
+          10n,
+          BigInt(messageId),
+          messageHash,
+        ]);
+      }
+    }
 
     {
       const hash = await test.write.verifyEvent([
