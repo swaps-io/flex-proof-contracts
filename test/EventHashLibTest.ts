@@ -27,16 +27,16 @@ describe('EventHashLibTest', async function () {
   });
 
   it('Should match offline event hash calc', async function () {
-    const hash = calcEventHash(
-      13371337133713371337n, // chain
-      '0x4242424242424242424242424242424242424242', // emitter
-      [ // topics
+    const hash = calcEventHash({
+      chain: 13371337133713371337n,
+      emitter: '0x4242424242424242424242424242424242424242',
+      topics: [
         '0x57949f7660111eb5ff4546c91bc5e7220c8c44367f671728233ff67a93d4b6fb',
         '0x68f4ed09cc4dd62fdaedda5e18d61f92ebaccdae113aa493e12ec730473bba2f',
         '0xe9611032ed20b631cc65c0687ae79d069040b4d71e1f17014fde6e43e21e3fb8',
       ],
-      '0x0123456789abcdef', // data
-    );
+      data: '0x0123456789abcdef',
+    });
     assert.equal(hash, '0x6ba22fad9f9be89da32392d1df40f5a0b82c430085752d2894944be5eaac310c');
   });
 });

@@ -2,7 +2,7 @@ import { encodeAbiParameters, Hex, hexToBigInt, parseAbiParameters, sliceHex } f
 
 import { asHex, AsHex } from './hex.js';
 
-export interface EncodeReceiptProofParams {
+export interface EncodeHashiReceiptProofParams {
   chainId: AsHex,
   blockNumber: AsHex,
   blockHeader: Hex,
@@ -13,7 +13,7 @@ export interface EncodeReceiptProofParams {
   logIndex: AsHex,
 }
 
-export const encodeReceiptProof = (params: EncodeReceiptProofParams): Hex => {
+export const encodeHashiReceiptProof = (params: EncodeHashiReceiptProofParams): Hex => {
   const proofStruct = encodeAbiParameters(
     parseAbiParameters([
       'ReceiptProof',
