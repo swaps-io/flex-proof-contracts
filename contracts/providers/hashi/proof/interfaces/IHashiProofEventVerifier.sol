@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.26;
 
-import {IEventVerifier} from "../../../interfaces/IEventVerifier.sol";
+import {IEventVerifier} from "../../../../interfaces/IEventVerifier.sol";
 
-interface IHashiEventVerifier is IEventVerifier {
+interface IHashiProofEventVerifier is IEventVerifier {
     error ProofChainMismatch(uint256 chain, uint256 proofChain);
     error ProofEventMismatch(bytes rlpEvent, bytes proofRlpEvent);
 

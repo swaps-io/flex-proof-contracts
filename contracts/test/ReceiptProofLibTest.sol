@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.26;
 
-import {ReceiptProofLib, ReceiptProof} from "../providers/hashi/libraries/ReceiptProofLib.sol";
+import {ReceiptProofLib, ReceiptProof} from "../providers/hashi/proof/libraries/ReceiptProofLib.sol";
 
 contract ReceiptProofLibTest {
     function test_decodeKnownProof(bytes32, string calldata, uint256, bytes calldata proof_, bytes calldata, bytes8, uint8) public pure {

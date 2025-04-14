@@ -2,14 +2,15 @@
 
 pragma solidity ^0.8.26;
 
-import {RlpEventLib} from "../../libraries/RlpEventLib.sol";
+import {RlpEventLib} from "../../../libraries/RlpEventLib.sol";
 
-import {IHashiEventVerifier} from "./interfaces/IHashiEventVerifier.sol";
+import {IHashiProofEventVerifier} from "./interfaces/IHashiProofEventVerifier.sol";
 
-import {HashiProverLib, ReceiptProof} from "./libraries/hashi/prover/HashiProverLib.sol";
+import {HashiProverLib, ReceiptProof} from "../libraries/hashi/prover/HashiProverLib.sol";
+
 import {ReceiptProofLib} from "./libraries/ReceiptProofLib.sol";
 
-contract HashiEventVerifier is IHashiEventVerifier {
+contract HashiProofEventVerifier is IHashiProofEventVerifier {
     address public immutable shoyuBashi;
 
     constructor(address shoyuBashi_) {
