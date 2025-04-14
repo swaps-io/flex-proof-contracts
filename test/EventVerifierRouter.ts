@@ -51,18 +51,13 @@ describe('EventVerifierRouter', async function () {
     hashiReceiver.address, // eventReceiver
   ]);
 
-  // Self verification [#103]
+  // Self verification
   const selfVerifier = await viem.deployContract('SelfEventVerifierTest', []);
-
-  // Save verification [#104]
-  const saveVerifier = await viem.deployContract('SaveEventVerifier', [router.address]);
 
   // Router setup
   await router.write.setChainVariantProvider([10n, 100n, hashiVerifier.address]);
   await router.write.setChainVariantProvider([10n, 101n, hashiReceiveVerifier.address]);
   await router.write.setChainVariantProvider([10n, 102n, hashiBatchReceiveVerifier.address]);
-  await router.write.setChainVariantProvider([thisChain, 103n, selfVerifier.address]);
-  await router.write.setChainVariantProvider([thisChain, 104n, saveVerifier.address]);
   await router.write.setChainVariantProvider([4321n, 101n, hashiReceiveVerifier.address]);
   await router.write.setChainRouter([4321n, '0xe0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0']);
 
@@ -275,48 +270,7 @@ describe('EventVerifierRouter', async function () {
     const eventHash = calcEventHash(chain, emitter, topics, data);
 
     const proof = joinProofs([
-      encodeRouterProof({ variant: 103n }),
-    ]);
-
-    {
-      const hash = await test.write.verifyEvent([
-        chain,
-        emitter,
-        topics,
-        data,
-        proof,
-      ]);
-
-      const receipt = await publicClient.getTransactionReceipt({ hash });
-      console.log(`Gas used: ${receipt.gasUsed}`);
-
-      const logs = parseEventLogs({
-        abi: test.abi,
-        logs: receipt.logs,
-        eventName: 'EventVerifyTest',
-        args: {
-          eventHash,
-        },
-      });
-      assert.equal(logs.length, 1);
-    }
-  });
-
-  it('Should verify event using save & self', async function () {
-    const chain = thisChain;
-    const emitter = selfVerifier.address;
-    const topics = [
-      keccak256(stringToBytes('ExpectedEvent(uint256)')),
-      asHex(133713371337n, 32),
-    ];
-    const data = stringToHex('test-event-data');
-
-    const eventHash = calcEventHash(chain, emitter, topics, data);
-
-    const proof = joinProofs([
-      encodeRouterProof({ variant: 104n }),
-      encodeSaveEventProof({ verify: true, save: true }),
-      encodeRouterProof({ variant: 103n }),
+      encodeRouterProof({ variant: 0n, emitterVerifier: true }),
     ]);
 
     {
