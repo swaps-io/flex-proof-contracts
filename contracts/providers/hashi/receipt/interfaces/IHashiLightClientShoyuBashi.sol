@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.26;
 
-import {IHashiProofShoyuBashi} from "./IHashiProofShoyuBashi.sol";
+import {IHashiReceiptShoyuBashi} from "./IHashiReceiptShoyuBashi.sol";
 
-interface IHashiLightClientShoyuBashi is IHashiProofShoyuBashi {
+interface IHashiLightClientShoyuBashi is IHashiReceiptShoyuBashi {
     error LightClientChainMismatch(uint256 expectedChain, uint256 chain);
     error LightClientMissingHeader(uint256 blockNumber);
 

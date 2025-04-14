@@ -4,13 +4,13 @@ pragma solidity ^0.8.26;
 
 import {RlpEventLib} from "../../../libraries/RlpEventLib.sol";
 
-import {IHashiProofEventVerifier} from "./interfaces/IHashiProofEventVerifier.sol";
+import {IHashiReceiptEventVerifier} from "./interfaces/IHashiReceiptEventVerifier.sol";
 
 import {HashiProverLib, ReceiptProof} from "../libraries/hashi/prover/HashiProverLib.sol";
 
 import {ReceiptProofLib} from "./libraries/ReceiptProofLib.sol";
 
-contract HashiProofEventVerifier is IHashiProofEventVerifier {
+contract HashiReceiptEventVerifier is IHashiReceiptEventVerifier {
     address public immutable shoyuBashi;
 
     constructor(address shoyuBashi_) {
@@ -25,9 +25,9 @@ contract HashiProofEventVerifier is IHashiProofEventVerifier {
         bytes calldata proof_
     ) external view {
         ReceiptProof calldata receiptProof = ReceiptProofLib.decode(proof_);
-        require(chain_ == receiptProof.chainId, ProofChainMismatch(chain_, receiptProof.chainId));
+        require(chain_ == receiptProof.chainId, ReceiptChainMismatch(chain_, receiptProof.chainId));
         bytes memory rlpEvent = RlpEventLib.encode(emitter_, topics_, data_);
         bytes memory proofRlpEvent = HashiProverLib.verifyForeignEvent(receiptProof, shoyuBashi);
-        require(keccak256(proofRlpEvent) == keccak256(rlpEvent), ProofEventMismatch(rlpEvent, proofRlpEvent));
+        require(keccak256(proofRlpEvent) == keccak256(rlpEvent), ReceiptEventMismatch(rlpEvent, proofRlpEvent));
     }
 }
