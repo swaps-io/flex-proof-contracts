@@ -5,13 +5,13 @@ pragma solidity ^0.8.26;
 import {IAdapter} from "../providers/hashi/libraries/hashi/interfaces/IAdapter.sol";
 
 contract AdapterTest is IAdapter {
-    mapping(uint256 domain => mapping(uint256 id => bytes32)) domainIdHash;
+    mapping(uint256 domain => mapping(uint256 id => bytes32)) _hashes;
 
     function getHash(uint256 domain_, uint256 id_) external view returns (bytes32) {
-        return domainIdHash[domain_][id_];
+        return _hashes[domain_][id_];
     }
 
     function setHash(uint256 domain_, uint256 id_, bytes32 hash_) external {
-        domainIdHash[domain_][id_] = hash_;
+        _hashes[domain_][id_] = hash_;
     }
 }
