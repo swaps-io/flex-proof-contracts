@@ -1,6 +1,6 @@
 {
   "name": "flex-proof-contracts",
-  "packageManager": "yarn@4.9.0",
+  "packageManager": "yarn@4.9.1",
   "type": "module",
   "scripts": {
     "h": "yarn hardhat",
@@ -10,20 +10,20 @@
     "tn": "yarn hardhat test node"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-ignition": "3.0.0-next.3",
-    "@nomicfoundation/hardhat-ignition-viem": "3.0.0-next.3",
-    "@nomicfoundation/hardhat-keystore": "3.0.0-next.3",
-    "@nomicfoundation/hardhat-network-helpers": "3.0.0-next.3",
-    "@nomicfoundation/hardhat-node-test-runner": "3.0.0-next.3",
-    "@nomicfoundation/hardhat-viem": "3.0.0-next.3",
-    "@types/node": "22.14.0",
+    "@nomicfoundation/hardhat-ignition": "3.0.0-next.4",
+    "@nomicfoundation/hardhat-ignition-viem": "3.0.0-next.4",
+    "@nomicfoundation/hardhat-keystore": "3.0.0-next.4",
+    "@nomicfoundation/hardhat-network-helpers": "3.0.0-next.4",
+    "@nomicfoundation/hardhat-node-test-runner": "3.0.0-next.4",
+    "@nomicfoundation/hardhat-viem": "3.0.0-next.4",
+    "@types/node": "22.14.1",
     "forge-std": "github:foundry-rs/forge-std#v1.9.6",
-    "hardhat": "3.0.0-next.3",
+    "hardhat": "3.0.0-next.4",
     "typescript": "~5.8.3",
-    "viem": "2.26.2"
+    "viem": "2.26.5"
   },
   "dependencies": {
     "@eth-optimism/contracts-bedrock": "patch:@eth-optimism/contracts-bedrock@npm%3A0.17.3#~/patches/@eth-optimism-contracts-bedrock-npm-0.17.3-e7ff7d2c90.patch",
-    "@openzeppelin/contracts": "5.2.0"
+    "@openzeppelin/contracts": "5.3.0"
   }
 }
