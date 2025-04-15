@@ -2,6 +2,6 @@
 
 pragma solidity ^0.8.26;
 
-struct RouterProof {
-    uint256 variant;
+struct RelayProof {
+    uint256[] relayChains;
 }

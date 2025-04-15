@@ -10,8 +10,6 @@ library RouterProofLib {
     }
 
     function consume(bytes calldata proof_) internal pure returns (bytes memory) {
-        RouterProof calldata routerProof = decode(proof_);
-        uint256 size = (3 + routerProof.relayChains.length) * 32; // 3: `variant`, `relayChains` offset, `relayChains` length
-        return proof_[size:];
+        return proof_[32:];
     }
 }
