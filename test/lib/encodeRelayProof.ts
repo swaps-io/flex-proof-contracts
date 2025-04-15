@@ -18,6 +18,6 @@ export const encodeRelayProof = (params: EncodeRelayProofParams): Hex => {
       },
     ],
   );
-  const proof = sliceHex(proofStruct, 64);
+  const proof = sliceHex(proofStruct, 32);
   return proof;
 };

@@ -15,6 +15,7 @@ import { EVENT_VERIFY_SIGNATURE } from './lib/eventVerifySignature.js';
 import { calcHashiMessageHash } from './lib/calcHashiMessageHash.js';
 import { encodeHashiMessage } from './lib/encodeHashiMessage.js';
 import { calcHashiMessageId } from './lib/calcHashiMessageId.js';
+import { encodeRelayProof } from './lib/encodeRelayProof.js';
 
 describe('EventVerifierRouter', async function () {
   const { viem } = await network.connect();
@@ -55,14 +56,21 @@ describe('EventVerifierRouter', async function () {
     adapters.map((a) => a.address), // adapters
   ]);
 
-  // Self verification
+  // Self verification [#200]
   const selfVerifier = await viem.deployContract('SelfEventVerifierTest', []);
+  const emitterVerifier = await viem.deployContract('EmitterEventVerifier');
+
+  // Relay verification [#300]
+  const relayRouterOwner = walletClient.account.address;
+  const relayVerifier = await viem.deployContract('RelayEventVerifier', [router.address, relayRouterOwner]);
+  await relayVerifier.write.setChainRelayEmitter([4321n, '0xe0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0']);
 
   // Router setup
   await router.write.setChainVariantProvider([10n, 100n, receiptVerifier.address]);
   await router.write.setChainVariantProvider([10n, 101n, messageVerifier.address]);
   await router.write.setChainVariantProvider([4321n, 101n, messageVerifier.address]);
-  await router.write.setChainRouter([4321n, '0xe0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0e0']);
+  await router.write.setChainVariantProvider([thisChain, 200n, emitterVerifier.address]);
+  await router.write.setChainVariantProvider([5555n, 300n, relayVerifier.address]);
 
   // Verifier test
   const test = await viem.deployContract('EventVerifierTest', [router.address]);
@@ -351,7 +359,7 @@ describe('EventVerifierRouter', async function () {
     const eventHash = calcEventHash({ chain, emitter, topics, data });
 
     const proof = joinProofs([
-      encodeRouterProof({ variant: 0n, emitterVerifier: true }),
+      encodeRouterProof({ variant: 200n }),
     ]);
 
     {
@@ -379,7 +387,7 @@ describe('EventVerifierRouter', async function () {
   });
 
   it('Should verify relayed event', async function () {
-    const chain = thisChain;
+    const chain = 5555n;
     const emitter = selfVerifier.address;
     const topics = [
       keccak256(stringToBytes('ExpectedEvent(uint256)')),
@@ -390,7 +398,9 @@ describe('EventVerifierRouter', async function () {
     const eventHash = calcEventHash({ chain, emitter, topics, data });
 
     const proof = joinProofs([
-      encodeRouterProof({ variant: 101n, relayChains: [4321n] }),
+      encodeRouterProof({ variant: 300n }),
+      encodeRelayProof({ relayChains: [4321n] }),
+      encodeRouterProof({ variant: 101n }),
       encodeHashiMessageProof({
         nonce: 444_555_111n,
         adapters: adapters.map((a) => a.address),

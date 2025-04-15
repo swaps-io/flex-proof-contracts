@@ -11,7 +11,7 @@ library RelayProofLib {
 
     function consume(bytes calldata proof_) internal pure returns (bytes memory) {
         RelayProof calldata relayProof = decode(proof_);
-        uint256 size = (1 + relayProof.relayChains.length) * 32; // 1: `relayChains` length
+        uint256 size = (2 + relayProof.relayChains.length) * 32; // 2: `relayChains` offset, `relayChains` length
         return proof_[size:];
     }
 }
