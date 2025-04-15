@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { network } from 'hardhat';
-import { keccak256, parseEventLogs, stringToBytes, stringToHex } from 'viem';
+import { Hex, keccak256, parseEventLogs, stringToBytes, stringToHex, zeroHash } from 'viem';
 
 import { calcEventHash } from './lib/calcEventHash.js';
 import { joinProofs } from './lib/joinProofs.js';
@@ -66,6 +66,17 @@ describe('EventVerifierRouter', async function () {
 
   // Verifier test
   const test = await viem.deployContract('EventVerifierTest', [router.address]);
+
+  async function setAdapter(index: number, domain: bigint, id: bigint, hash: Hex) {
+    const adapter = adapters[index];
+    await adapter.write.setHash([domain, id, hash])
+  }
+
+  async function resetAdapters(domain: bigint, id: bigint) {
+    for (let i = 0; i < adapters.length; i++) {
+      await setAdapter(i, domain, id, zeroHash);
+    }
+  }
 
   it('Should verify event using Hashi receipt', async function () {
     // Based on:
@@ -167,18 +178,35 @@ describe('EventVerifierRouter', async function () {
         adapters: adapters.map((a) => a.address),
       });
       const messageHash = calcHashiMessageHash({ message });
-      const messageId = calcHashiMessageId({
+      const messageId = BigInt(calcHashiMessageId({
         sourceChainId: 10n,
         dispatcherAddress: '0xbeef0000dead0000beef0000dead0000beef0000',
         messageHash,
-      });
-      for (const adapter of [adapters[0], adapters[2]]) {
-        await adapter.write.setHash([
-          10n,
-          BigInt(messageId),
-          messageHash,
+      }));
+
+      await resetAdapters(10n, messageId);
+      await assert.rejects(async () => {
+        await test.write.verifyEvent([
+          chain,
+          emitter,
+          topics,
+          data,
+          proof,
         ]);
-      }
+      });
+
+      await setAdapter(0, 10n, messageId, messageHash);
+      await assert.rejects(async () => {
+        await test.write.verifyEvent([
+          chain,
+          emitter,
+          topics,
+          data,
+          proof,
+        ]);
+      });
+
+      await setAdapter(2, 10n, messageId, messageHash);
     }
 
     {
@@ -256,18 +284,35 @@ describe('EventVerifierRouter', async function () {
         adapters: adapters.map((a) => a.address),
       });
       const messageHash = calcHashiMessageHash({ message });
-      const messageId = calcHashiMessageId({
+      const messageId = BigInt(calcHashiMessageId({
         sourceChainId: 10n,
         dispatcherAddress: '0xbeef0000dead0000beef0000dead0000beef0000',
         messageHash,
-      });
-      for (const adapter of [adapters[0], adapters[2]]) {
-        await adapter.write.setHash([
-          10n,
-          BigInt(messageId),
-          messageHash,
+      }));
+
+      await resetAdapters(10n, messageId);
+      await assert.rejects(async () => {
+        await test.write.verifyEvent([
+          chain,
+          emitter,
+          topics,
+          data,
+          proof,
         ]);
-      }
+      });
+
+      await setAdapter(0, 10n, messageId, messageHash);
+      await assert.rejects(async () => {
+        await test.write.verifyEvent([
+          chain,
+          emitter,
+          topics,
+          data,
+          proof,
+        ]);
+      });
+
+      await setAdapter(2, 10n, messageId, messageHash);
     }
 
     {
@@ -376,18 +421,35 @@ describe('EventVerifierRouter', async function () {
         adapters: adapters.map((a) => a.address),
       });
       const messageHash = calcHashiMessageHash({ message });
-      const messageId = calcHashiMessageId({
+      const messageId = BigInt(calcHashiMessageId({
         sourceChainId: 10n,
         dispatcherAddress: '0xbeef0000dead0000beef0000dead0000beef0000',
         messageHash,
-      });
-      for (const adapter of [adapters[0], adapters[2]]) {
-        await adapter.write.setHash([
-          10n,
-          BigInt(messageId),
-          messageHash,
+      }));
+
+      await resetAdapters(10n, messageId);
+      await assert.rejects(async () => {
+        await test.write.verifyEvent([
+          chain,
+          emitter,
+          topics,
+          data,
+          proof,
         ]);
-      }
+      });
+
+      await setAdapter(0, 10n, messageId, messageHash);
+      await assert.rejects(async () => {
+        await test.write.verifyEvent([
+          chain,
+          emitter,
+          topics,
+          data,
+          proof,
+        ]);
+      });
+
+      await setAdapter(2, 10n, messageId, messageHash);
     }
 
     {
