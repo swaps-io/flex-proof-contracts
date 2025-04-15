@@ -5,10 +5,11 @@ pragma solidity ^0.8.26;
 import {Ownable2Step, Ownable} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import {Multicall} from "@openzeppelin/contracts/utils/Multicall.sol";
 
+import {EventHashLib} from "../libraries/EventHashLib.sol";
+
 import {IEventVerifierRouter, IEventVerifier} from "./interfaces/IEventVerifierRouter.sol";
 
 import {RouterProofLib, RouterProof} from "./libraries/RouterProofLib.sol";
-import {EventHashLib} from "./libraries/EventHashLib.sol";
 
 contract EventVerifierRouter is IEventVerifierRouter, Ownable2Step, Multicall {
     uint256 private constant EMITTER_VERIFIER_BIT = 1 << 255;

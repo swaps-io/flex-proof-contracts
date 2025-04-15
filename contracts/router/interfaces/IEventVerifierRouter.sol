@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.26;
 
-import {IEventVerifier} from "./IEventVerifier.sol";
+import {IEventVerifier} from "../../interfaces/IEventVerifier.sol";
 
 interface IEventVerifierRouter is IEventVerifier {
     error SameChainRouter(uint256 chain, address router);

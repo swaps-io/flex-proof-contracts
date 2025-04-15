@@ -4,8 +4,9 @@ pragma solidity ^0.8.26;
 
 import {Ownable2Step, Ownable} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 
+import {IEventVerifier} from "../interfaces/IEventVerifier.sol";
+
 import {IProofVerifierCompat} from "./interfaces/IProofVerifierCompat.sol";
-import {IEventVerifier} from "./interfaces/IEventVerifier.sol";
 
 contract ProofVerifierCompat is IProofVerifierCompat, Ownable2Step {
     address public immutable eventVerifier;
