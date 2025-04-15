@@ -98,6 +98,7 @@ contract HashiEventMessageSender is IHashiEventMessageSender {
         bytes32[] memory eventHashes_,
         HashiMessageParams calldata params_
     ) private {
+        require(eventHashes_.length != 0, EmptyEventBatch());
         bytes32 eventsHash = EventsHashLib.calc(eventHashes_);
         _sendHash(eventsHash, params_);
     }

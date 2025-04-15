@@ -7,6 +7,8 @@ import {HashiMessageParams} from "./HashiMessageParams.sol";
 
 
 interface IHashiEventMessageSender {
+    error EmptyEventBatch();
+
     function eventVerifier() external view returns (address);
 
     function sendEvent(
