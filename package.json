@@ -20,7 +20,7 @@
     "forge-std": "github:foundry-rs/forge-std#v1.9.6",
     "hardhat": "3.0.0-next.4",
     "typescript": "~5.8.3",
-    "viem": "2.26.5"
+    "viem": "2.27.0"
   },
   "dependencies": {
     "@eth-optimism/contracts-bedrock": "patch:@eth-optimism/contracts-bedrock@npm%3A0.17.3#~/patches/@eth-optimism-contracts-bedrock-npm-0.17.3-e7ff7d2c90.patch",

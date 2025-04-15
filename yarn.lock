@@ -511,12 +511,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/curves@npm:1.8.1, @noble/curves@npm:^1.6.0, @noble/curves@npm:~1.8.1":
+"@noble/curves@npm:1.8.1":
   version: 1.8.1
   resolution: "@noble/curves@npm:1.8.1"
   dependencies:
     "@noble/hashes": "npm:1.7.1"
   checksum: 10c0/84902c7af93338373a95d833f77981113e81c48d4bec78f22f63f1f7fdd893bc1d3d7a3ee78f01b9a8ad3dec812a1232866bf2ccbeb2b1560492e5e7d690ab1f
+  languageName: node
+  linkType: hard
+
+"@noble/curves@npm:^1.6.0, @noble/curves@npm:~1.8.1":
+  version: 1.8.2
+  resolution: "@noble/curves@npm:1.8.2"
+  dependencies:
+    "@noble/hashes": "npm:1.7.2"
+  checksum: 10c0/e7ef119b114681d6b7530b29a21f9bbea6fa6973bc369167da2158d05054cc6e6dbfb636ba89fad7707abacc150de30188b33192f94513911b24bdb87af50bbd
   languageName: node
   linkType: hard
 
@@ -534,10 +543,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/hashes@npm:1.7.1, @noble/hashes@npm:^1.5.0, @noble/hashes@npm:~1.7.1":
+"@noble/hashes@npm:1.7.1":
   version: 1.7.1
   resolution: "@noble/hashes@npm:1.7.1"
   checksum: 10c0/2f8ec0338ccc92b576a0f5c16ab9c017a3a494062f1fbb569ae641c5e7eab32072f9081acaa96b5048c0898f972916c818ea63cbedda707886a4b5ffcfbf94e3
+  languageName: node
+  linkType: hard
+
+"@noble/hashes@npm:1.7.2, @noble/hashes@npm:^1.5.0, @noble/hashes@npm:~1.7.1":
+  version: 1.7.2
+  resolution: "@noble/hashes@npm:1.7.2"
+  checksum: 10c0/b1411eab3c0b6691d847e9394fe7f1fcd45eeb037547c8f97e7d03c5068a499b4aef188e8e717eee67389dca4fee17d69d7e0f58af6c092567b0b76359b114b2
   languageName: node
   linkType: hard
 
@@ -1422,13 +1438,13 @@ __metadata:
   linkType: hard
 
 "@types/pg@npm:*":
-  version: 8.11.12
-  resolution: "@types/pg@npm:8.11.12"
+  version: 8.11.13
+  resolution: "@types/pg@npm:8.11.13"
   dependencies:
     "@types/node": "npm:*"
     pg-protocol: "npm:*"
     pg-types: "npm:^4.0.1"
-  checksum: 10c0/290a4ef201fb685de92c2201118c3069195c7a75fbf006a68fdf4a48f46681b06fcf30dd4eea56b5edf355750534976d762b3a54458697b1737a836767bbceae
+  checksum: 10c0/a111989a223f21ff864e35150474409e9659766603e4f7a51f89ffc173292adcd895c1551f792aaf1cf94afe99e4bd1dbf7c740252c1dca2a5038f1fd2c6e0bd
   languageName: node
   linkType: hard
 
@@ -1907,7 +1923,7 @@ __metadata:
     forge-std: "github:foundry-rs/forge-std#v1.9.6"
     hardhat: "npm:3.0.0-next.4"
     typescript: "npm:~5.8.3"
-    viem: "npm:2.26.5"
+    viem: "npm:2.27.0"
   languageName: unknown
   linkType: soft
 
@@ -3088,9 +3104,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:2.26.5":
-  version: 2.26.5
-  resolution: "viem@npm:2.26.5"
+"viem@npm:2.27.0":
+  version: 2.27.0
+  resolution: "viem@npm:2.27.0"
   dependencies:
     "@noble/curves": "npm:1.8.1"
     "@noble/hashes": "npm:1.7.1"
@@ -3105,7 +3121,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/b89f4d0bd1c01b766cbfeba7f032194423d38e25a79291745989ad0b00ddfd30aeaa984311960079de0fb206d0c36d5773d5170bf71520c1c2af21523e2f2c00
+  checksum: 10c0/0c36fd742e6d4224229169048532f2576ed28a313258f4d41f5064e4134a46d5674253960b4703cc2cfc41c04902a3c469043bb7015ca70b0a8b392667317f6b
   languageName: node
   linkType: hard
 
