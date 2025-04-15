@@ -50,11 +50,12 @@ contract HashiMessageEventVerifier is IHashiMessageEventVerifier, MessageHashCal
         bytes32 hash = EventHashLib.calc(chain_, emitter_, topics_, data_);
         if (messageProof.batchHashes.length != 0) {
             bytes32 batchHash = messageProof.batchHashes[messageProof.batchIndex];
-            require(batchHash == hash, TODO()); // BatchEventHashMismatch(batchProof.batchIndex, batchHash, hash)
+            require(batchHash == hash, BatchEventHashMismatch(hash, batchHash, messageProof.batchIndex));
             hash = EventsHashLib.calc(messageProof.batchHashes);
         }
 
-        require(adaptersHash == _calcAdaptersHash(messageProof.adapters), TODO());
+        bytes32 proofAdaptersHash = _calcAdaptersHash(messageProof.adapters);
+        require(proofAdaptersHash == adaptersHash, AdaptersHashMismatch(adaptersHash, proofAdaptersHash));
 
         Message memory message = Message({
             nonce: messageProof.nonce,
@@ -69,7 +70,7 @@ contract HashiMessageEventVerifier is IHashiMessageEventVerifier, MessageHashCal
         bytes32 messageHash = calculateMessageHash(message);
         uint256 messageId = calculateMessageId(chain, yaho, messageHash);
 
-        require(IHashi(hashi).checkHashWithThresholdFromAdapters(chain, messageId, threshold, message.adapters), TODO());
+        require(IHashi(hashi).checkHashWithThresholdFromAdapters(chain, messageId, threshold, message.adapters), MessageNotConfirmed(messageId, messageProof.adapters));
     }
 
     function _calcAdaptersHash(address[] memory adapters_) private pure returns (bytes32 hash) {

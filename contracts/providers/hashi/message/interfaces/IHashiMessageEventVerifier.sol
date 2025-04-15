@@ -5,7 +5,9 @@ pragma solidity ^0.8.26;
 import {IEventVerifier} from "../../../../interfaces/IEventVerifier.sol";
 
 interface IHashiMessageEventVerifier is IEventVerifier {
-    error TODO(); // TODO
+    error BatchEventHashMismatch(bytes32 eventHash, bytes32 batchEventHash, uint256 batchEventIndex);
+    error AdaptersHashMismatch(bytes32 adaptersHash, bytes32 proofAdaptersHash);
+    error MessageNotConfirmed(uint256 messageId, address[] adapters);
 
     function chain() external view returns (uint256);
 
