@@ -157,7 +157,7 @@ describe('EventVerifierRouter', async function () {
     // Emulate receive
     {
       const message = encodeHashiMessage({
-        nonce: 9090909090n,
+        nonce: 444_555_111n,
         targetChainId: thisChain,
         threshold: 2n,
         sender: '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
@@ -246,7 +246,7 @@ describe('EventVerifierRouter', async function () {
     // Emulate batch receive
     {
       const message = encodeHashiMessage({
-        nonce: 9090909090n,
+        nonce: 444_555_111n,
         targetChainId: thisChain,
         threshold: 2n,
         sender: '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
@@ -346,6 +346,11 @@ describe('EventVerifierRouter', async function () {
 
     const proof = joinProofs([
       encodeRouterProof({ variant: 101n, relayChains: [4321n] }),
+      encodeHashiMessageProof({
+        nonce: 444_555_111n,
+        adapters: adapters.map((a) => a.address),
+        reporters,
+      }),
     ]);
 
     const relayEventHash = calcEventHash({
@@ -361,7 +366,7 @@ describe('EventVerifierRouter', async function () {
     // Emulate receive
     {
       const message = encodeHashiMessage({
-        nonce: 9090909090n,
+        nonce: 444_555_111n,
         targetChainId: thisChain,
         threshold: 2n,
         sender: '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
