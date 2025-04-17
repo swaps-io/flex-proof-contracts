@@ -11,7 +11,7 @@ import {IHashiReceiptEventVerifier} from "./interfaces/IHashiReceiptEventVerifie
 import {ReceiptProofLib} from "./libraries/ReceiptProofLib.sol";
 
 contract HashiReceiptEventVerifier is IHashiReceiptEventVerifier {
-    address public immutable shoyuBashi;
+    address public immutable override shoyuBashi;
 
     constructor(address shoyuBashi_) {
         shoyuBashi = shoyuBashi_;
@@ -23,7 +23,7 @@ contract HashiReceiptEventVerifier is IHashiReceiptEventVerifier {
         bytes32[] calldata topics_,
         bytes calldata data_,
         bytes calldata proof_
-    ) external view {
+    ) external view override {
         ReceiptProof calldata receiptProof = ReceiptProofLib.decode(proof_);
         require(chain_ == receiptProof.chainId, ReceiptChainMismatch(chain_, receiptProof.chainId));
         bytes memory rlpEvent = RlpEventLib.encode(emitter_, topics_, data_);

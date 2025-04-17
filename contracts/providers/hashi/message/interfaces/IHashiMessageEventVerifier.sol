@@ -5,19 +5,8 @@ pragma solidity ^0.8.26;
 import {IEventVerifier} from "../../../../interfaces/IEventVerifier.sol";
 
 interface IHashiMessageEventVerifier is IEventVerifier {
-    error BatchEventHashMismatch(bytes32 eventHash, bytes32 batchEventHash, uint256 batchEventIndex);
-    error AdaptersHashMismatch(bytes32 adaptersHash, bytes32 proofAdaptersHash);
-    error MessageNotConfirmed(uint256 messageId, address[] adapters);
+    error EventHashMismatch(bytes32 eventHash, bytes32 proofEventHash, uint256 proofEventIndex);
+    error MessageNotConfirmed(uint256 domain, uint256 messageId, bytes32 messageHash, bytes32 thresholdHash);
 
-    function chain() external view returns (uint256);
-
-    function sender() external view returns (address);
-
-    function yaho() external view returns (address);
-
-    function hashi() external view returns (address);
-
-    function threshold() external view returns (uint256);
-
-    function adaptersHash() external view returns (bytes32);
+    function shoyuBashi() external view returns (address);
 }

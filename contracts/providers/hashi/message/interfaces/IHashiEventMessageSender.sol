@@ -2,39 +2,15 @@
 
 pragma solidity ^0.8.26;
 
-import {HashiBatchEvent, HashiBatchEventNoChain, HashiBatchEventNoChainEmitter} from "./HashiBatchEvent.sol";
+import {HashiMessageEvent} from "./HashiMessageEvent.sol";
 import {HashiMessageParams} from "./HashiMessageParams.sol";
-
 
 interface IHashiEventMessageSender {
     error EmptyEventBatch();
 
     function eventVerifier() external view returns (address);
 
-    function sendEvent(
-        uint256 chain,
-        address emitter,
-        bytes32[] calldata topics,
-        bytes calldata data,
-        bytes calldata proof,
-        HashiMessageParams calldata params
-    ) external;
+    function yaho() external view returns (address);
 
-    function sendEventBatch(
-        HashiBatchEvent[] calldata events,
-        HashiMessageParams calldata params
-    ) external;
-
-    function sendEventBatch(
-        uint256 chain,
-        HashiBatchEventNoChain[] calldata events,
-        HashiMessageParams calldata params
-    ) external;
-
-    function sendEventBatch(
-        uint256 chain,
-        address emitter,
-        HashiBatchEventNoChainEmitter[] calldata events,
-        HashiMessageParams calldata params
-    ) external;
+    function sendEventMessage(HashiMessageEvent[] calldata events, HashiMessageParams calldata params) external payable;
 }
