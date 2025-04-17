@@ -14,15 +14,15 @@ import {RelayProofLib, RelayProof} from "./libraries/RelayProofLib.sol";
 contract RelayEventVerifier is IRelayEventVerifier, Ownable2Step, Multicall {
     bytes32 private constant EVENT_VERIFY_SIGNATURE = 0x6cd36dcc6f96864e428558cad95b6c499ce5ea37cfa95110af6c5239fbdf90cf; // keccak256("EventVerify(bytes32)")
 
-    address public immutable eventVerifier;
-    mapping(uint256 chain => address) public chainRelayEmitter;
+    address public immutable override eventVerifier;
+    mapping(uint256 chain => address) public override chainRelayEmitter;
 
     constructor(address eventVerifier_, address initialOwner_)
         Ownable(initialOwner_) {
         eventVerifier = eventVerifier_;
     }
 
-    function setChainRelayEmitter(uint256 chain_, address emitter_) external onlyOwner {
+    function setChainRelayEmitter(uint256 chain_, address emitter_) external override onlyOwner {
         address oldEmitter = chainRelayEmitter[chain_];
         require(emitter_ != oldEmitter, SameChainRelayEmitter(chain_, emitter_));
         chainRelayEmitter[chain_] = emitter_;

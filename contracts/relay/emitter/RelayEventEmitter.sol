@@ -7,7 +7,7 @@ import {EventHashLib} from "../../libraries/EventHashLib.sol";
 import {IRelayEventEmitter, IEventVerifier} from "./interfaces/IRelayEventEmitter.sol";
 
 contract RelayEventEmitter is IRelayEventEmitter {
-    address public immutable eventVerifier;
+    address public immutable override eventVerifier;
 
     constructor(address eventVerifier_) {
         eventVerifier = eventVerifier_;
@@ -19,7 +19,7 @@ contract RelayEventEmitter is IRelayEventEmitter {
         bytes32[] memory topics_,
         bytes memory data_,
         bytes calldata proof_
-    ) external {
+    ) external override {
         IEventVerifier(eventVerifier).verifyEvent(chain_, emitter_, topics_, data_, proof_);
         bytes32 eventHash = EventHashLib.calc(chain_, emitter_, topics_, data_);
         emit EventVerify(eventHash);

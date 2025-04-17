@@ -9,15 +9,15 @@ import {IEventVerifier} from "../interfaces/IEventVerifier.sol";
 import {IProofVerifierCompat} from "./interfaces/IProofVerifierCompat.sol";
 
 contract ProofVerifierCompat is IProofVerifierCompat, Ownable2Step {
-    address public immutable eventVerifier;
-    mapping(uint256 chain => address) public chainEmitter;
+    address public immutable override eventVerifier;
+    mapping(uint256 chain => address) public override chainEmitter;
 
     constructor(address eventVerifier_, address initialOwner_)
         Ownable(initialOwner_) {
         eventVerifier = eventVerifier_;
     }
 
-    function setChainEmitter(uint256 chain_, address emitter_) external onlyOwner {
+    function setChainEmitter(uint256 chain_, address emitter_) external override onlyOwner {
         address oldEmitter = chainEmitter[chain_];
         require(emitter_ != oldEmitter, SameChainEmitter(chain_, emitter_));
         chainEmitter[chain_] = emitter_;

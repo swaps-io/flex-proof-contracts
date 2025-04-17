@@ -11,7 +11,7 @@ contract EmitterEventVerifier is IEmitterEventVerifier {
         bytes32[] calldata topics_,
         bytes calldata data_,
         bytes calldata proof_
-    ) external {
+    ) external override {
         IEventVerifier(emitter_).verifyEvent(chain_, emitter_, topics_, data_, proof_);
     }
 }

@@ -10,12 +10,12 @@ import {IEventVerifierRouter, IEventVerifier} from "./interfaces/IEventVerifierR
 import {RouterProofLib, RouterProof} from "./libraries/RouterProofLib.sol";
 
 contract EventVerifierRouter is IEventVerifierRouter, Ownable2Step, Multicall {
-    mapping(uint256 chain => mapping(uint256 variant => address)) public chainVariantProvider;
+    mapping(uint256 chain => mapping(uint256 variant => address)) public override chainVariantProvider;
 
     constructor(address initialOwner_)
         Ownable(initialOwner_) {}
 
-    function setChainVariantProvider(uint256 chain_, uint256 variant_, address provider_) external onlyOwner {
+    function setChainVariantProvider(uint256 chain_, uint256 variant_, address provider_) external override onlyOwner {
         address oldProvider = chainVariantProvider[chain_][variant_];
         require(provider_ != oldProvider, SameChainVariantProvider(chain_, variant_, provider_));
         chainVariantProvider[chain_][variant_] = provider_;
