@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.26;
 
+import {MessageHashCalculator, Message} from "@gnosis/hashi-evm/contracts/utils/MessageHashCalculator.sol";
+import {MessageIdCalculator} from "@gnosis/hashi-evm/contracts/utils/MessageIdCalculator.sol";
+import {IHashi} from "@gnosis/hashi-evm/contracts/interfaces/IHashi.sol";
+
 import {EventHashLib} from "../../../libraries/EventHashLib.sol";
 import {EventsHashLib} from "../../../libraries/EventsHashLib.sol";
-
-import {MessageHashCalculator, Message} from "../libraries/hashi/utils/MessageHashCalculator.sol";
-import {MessageIdCalculator} from "../libraries/hashi/utils/MessageIdCalculator.sol";
-import {IHashi} from "../libraries/hashi/interfaces/IHashi.sol";
 
 import {IHashiMessageEventVerifier} from "./interfaces/IHashiMessageEventVerifier.sol";
 

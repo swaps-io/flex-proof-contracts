@@ -2,11 +2,11 @@
 
 pragma solidity ^0.8.26;
 
+import {HashiProverLib, ReceiptProof} from "@gnosis/hashi-evm/contracts/prover/HashiProverLib.sol";
+
 import {RlpEventLib} from "../../../libraries/RlpEventLib.sol";
 
 import {IHashiReceiptEventVerifier} from "./interfaces/IHashiReceiptEventVerifier.sol";
-
-import {HashiProverLib, ReceiptProof} from "../libraries/hashi/prover/HashiProverLib.sol";
 
 import {ReceiptProofLib} from "./libraries/ReceiptProofLib.sol";
 

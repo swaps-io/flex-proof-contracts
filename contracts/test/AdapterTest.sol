@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.26;
 
-import {IAdapter} from "../providers/hashi/libraries/hashi/interfaces/IAdapter.sol";
+import {IAdapter} from "@gnosis/hashi-evm/contracts/interfaces/IAdapter.sol";
 
 contract AdapterTest is IAdapter {
     mapping(uint256 domain => mapping(uint256 id => bytes32)) _hashes;

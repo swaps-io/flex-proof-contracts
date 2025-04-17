@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.26;
 
-import {IReporter, IAdapter} from "../../libraries/hashi/interfaces/IReporter.sol";
+import {IReporter, IAdapter} from "@gnosis/hashi-evm/contracts/interfaces/IReporter.sol";
 
 library HashiMessageCastLib {
     function asReporters(address[] memory addresses_) internal pure returns (IReporter[] memory reporters) {

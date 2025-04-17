@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.26;
 
+import {IYaho} from "@gnosis/hashi-evm/contracts/interfaces/IYaho.sol";
+
 import {IEventVerifier} from "../../../interfaces/IEventVerifier.sol";
 
 import {EventHashLib} from "../../../libraries/EventHashLib.sol";
 import {EventsHashLib} from "../../../libraries/EventsHashLib.sol";
-
-import {IYaho} from "../libraries/hashi/interfaces/IYaho.sol";
 
 import {
     IHashiEventMessageSender,
