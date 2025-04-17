@@ -3,26 +3,26 @@ import { encodeAbiParameters, Hex, hexToBigInt, parseAbiParameters, sliceHex } f
 import { asHex, AsHex } from './hex.js';
 
 export interface EncodeHashiMessageProofParams {
-  batchHashes?: readonly AsHex[],
-  batchIndex?: AsHex,
+  eventHashes: readonly AsHex[],
+  eventIndex: AsHex,
   nonce: AsHex,
+  yaho: AsHex,
   reporters: readonly AsHex[],
-  adapters: readonly AsHex[],
 }
 
 export const encodeHashiMessageProof = (params: EncodeHashiMessageProofParams): Hex => {
   const proofStruct = encodeAbiParameters(
     parseAbiParameters([
       'HashiMessageProof',
-      'struct HashiMessageProof { bytes32[] batchHashes; uint256 batchIndex; uint256 nonce; address[] reporters; address[] adapters; }',
+      'struct HashiMessageProof { bytes32[] eventHashes; uint256 eventIndex; uint256 nonce; address yaho; address[] reporters; }',
     ]),
     [
       {
-        batchHashes: (params.batchHashes ?? []).map((h) => asHex(h, 32)),
-        batchIndex: hexToBigInt(asHex(params.batchIndex ?? 0n, 32)),
+        eventHashes: params.eventHashes.map((h) => asHex(h, 32)),
+        eventIndex: hexToBigInt(asHex(params.eventIndex, 32)),
         nonce: hexToBigInt(asHex(params.nonce, 32)),
+        yaho: asHex(params.yaho, 20),
         reporters: params.reporters.map((r) => asHex(r, 20)),
-        adapters: params.adapters.map((r) => asHex(r, 20)),
       },
     ],
   );

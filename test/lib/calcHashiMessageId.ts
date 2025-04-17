@@ -9,12 +9,12 @@ export interface CalcHashiMessageIdParams {
 }
 
 // Logic of `MessageIdCalculator.sol`
-export const calcHashiMessageId = (params: CalcHashiMessageIdParams): Hex => {
+export const calcHashiMessageId = (params: CalcHashiMessageIdParams): bigint => {
   const messageIdData = concatHex([
     asHex(params.sourceChainId, 32),
     asHex(params.dispatcherAddress, 32),
     asHex(params.messageHash, 32),
   ]);
-  const messageId = keccak256(messageIdData);
+  const messageId = BigInt(keccak256(messageIdData));
   return messageId;
 };

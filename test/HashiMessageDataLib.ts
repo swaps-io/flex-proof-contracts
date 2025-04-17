@@ -3,14 +3,14 @@ import assert from 'node:assert/strict';
 
 import { network } from 'hardhat';
 
-import { calcEventsHash } from './lib/calcEventsHash.js';
+import { calcHashiMessageData } from './lib/calcHashiMessageData.js';
 
-describe('EventsHashLibTest', async function () {
+describe('HashiMessageDataLib', async function () {
   const { viem } = await network.connect();
-  const lib = await viem.deployContract('EventsHashLibTest');
+  const lib = await viem.deployContract('HashiMessageDataLibTest');
 
   it('Should calc expected events hash', async function () {
-    const hash = await lib.read.calc([
+    const data = await lib.read.calc([
       [
         '0x73882357d2fd431bce5119513a20e7e5e45cfb0b6ff8d31e576c40c182b85e85',
         '0x1a44fb1eb8678588d1273f536f7bb0ceabb28d6055717fa481e13f81a540d5e4',
@@ -18,11 +18,11 @@ describe('EventsHashLibTest', async function () {
         '0xc0d1b4c1795e532b96fdfbfd8f4768636f53355319f32f486aa537d8c73fcf44',
       ],
     ]);
-    assert.equal(hash, '0xfec6baeb2e2ab8008f0bca154411e1cf7ca6e7a5eab194436c250d319896cec7');
+    assert.equal(data, '0xfec6baeb2e2ab8008f0bca154411e1cf7ca6e7a5eab194436c250d319896cec7');
   });
 
   it('Should match offline events hash calc', async function () {
-    const hash = calcEventsHash({
+    const data = calcHashiMessageData({
       eventHashes: [
         '0x73882357d2fd431bce5119513a20e7e5e45cfb0b6ff8d31e576c40c182b85e85',
         '0x1a44fb1eb8678588d1273f536f7bb0ceabb28d6055717fa481e13f81a540d5e4',
@@ -30,6 +30,6 @@ describe('EventsHashLibTest', async function () {
         '0xc0d1b4c1795e532b96fdfbfd8f4768636f53355319f32f486aa537d8c73fcf44',
       ],
     });
-    assert.equal(hash, '0xfec6baeb2e2ab8008f0bca154411e1cf7ca6e7a5eab194436c250d319896cec7');
+    assert.equal(data, '0xfec6baeb2e2ab8008f0bca154411e1cf7ca6e7a5eab194436c250d319896cec7');
   });
 });

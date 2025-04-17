@@ -2,12 +2,12 @@ import { concatHex, Hex, keccak256 } from 'viem';
 
 import { AsHex, asHex } from './hex.js';
 
-export interface CalcEventsHashParams {
+export interface CalcHashiMessageDataParams {
   eventHashes: readonly AsHex[],
 }
 
-// Logic of `EventsHashLib.sol`
-export const calcEventsHash = (params: CalcEventsHashParams): Hex => {
+// Logic of `HashiMessageDataLib.sol`
+export const calcHashiMessageData = (params: CalcHashiMessageDataParams): Hex => {
   const eventsData = concatHex(params.eventHashes.map((h) => asHex(h, 32)));
   const eventsHash = keccak256(eventsData);
   return eventsHash;
