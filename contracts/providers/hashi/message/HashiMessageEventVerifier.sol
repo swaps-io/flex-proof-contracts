@@ -32,24 +32,32 @@ contract HashiMessageEventVerifier is IHashiMessageEventVerifier, MessageHashCal
         bytes32 proofEventHash = messageProof.eventHashes[messageProof.eventIndex];
         require(proofEventHash == eventHash, EventHashMismatch(eventHash, proofEventHash, messageProof.eventIndex));
 
-        (uint256 threshold,) = IShoyuBashi(shoyuBashi).getThresholdAndCount(chain_);
-        IAdapter[] memory adapters = IShoyuBashi(shoyuBashi).getAdapters(chain_);
-        address sender = address(IShoyuBashi(shoyuBashi).getAdapters(chain_ << 160)[0]);
-
         Message memory message = Message({
             nonce: messageProof.nonce,
             targetChainId: block.chainid,
-            threshold: threshold,
-            sender: sender,
+            threshold: _getShoyuBashiThreshold(chain_),
+            sender: _getShoyuBashiSender(chain_),
             receiver: address(this),
             data: HashiMessageDataLib.calc(messageProof.eventHashes),
             reporters: messageProof.reporters,
-            adapters: adapters
+            adapters: IShoyuBashi(shoyuBashi).getAdapters(chain_)
         });
         bytes32 messageHash = calculateMessageHash(message);
         uint256 messageId = calculateMessageId(chain_, messageProof.yaho, messageHash);
 
         bytes32 thresholdHash = IShoyuBashi(shoyuBashi).getThresholdHash(chain_, messageId);
         require(thresholdHash == messageHash, MessageNotConfirmed(chain_, messageId, messageHash, thresholdHash));
+    }
+
+    function _getShoyuBashiThreshold(uint256 domain_) private view returns (uint256 threshold) {
+        (threshold, ) = IShoyuBashi(shoyuBashi).getThresholdAndCount(domain_);
+    }
+
+    function _getShoyuBashiSender(uint256 domain_) private view returns (address sender) {
+        uint256 senderDomain = domain_ << 160;
+        IAdapter[] memory senderAdapters = IShoyuBashi(shoyuBashi).getAdapters(senderDomain);
+        require(senderAdapters.length == 1, InvalidSenderAdapter(domain_, senderDomain, senderAdapters));
+        sender = address(senderAdapters[0]);
+        require(sender != address(0), InvalidSenderAdapter(domain_, senderDomain, senderAdapters));
     }
 }
