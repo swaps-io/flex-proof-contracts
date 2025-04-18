@@ -3,12 +3,13 @@
 pragma solidity ^0.8.26;
 
 import {Ownable2Step, Ownable} from "@openzeppelin/contracts/access/Ownable2Step.sol";
+import {Multicall} from "@openzeppelin/contracts/utils/Multicall.sol";
 
 import {IEventVerifier} from "../interfaces/IEventVerifier.sol";
 
 import {IProofVerifierCompat} from "./interfaces/IProofVerifierCompat.sol";
 
-contract ProofVerifierCompat is IProofVerifierCompat, Ownable2Step {
+contract ProofVerifierCompat is IProofVerifierCompat, Ownable2Step, Multicall {
     address public immutable override eventVerifier;
     mapping(uint256 chain => address) public override chainEmitter;
 
