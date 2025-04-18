@@ -16,7 +16,6 @@ import { encodeHashiMessage } from './lib/encodeHashiMessage.js';
 import { calcHashiMessageId } from './lib/calcHashiMessageId.js';
 import { encodeRelayProof } from './lib/encodeRelayProof.js';
 import { calcHashiMessageData } from './lib/calcHashiMessageData.js';
-import { calcHashiSenderDomain } from './lib/calcHashiSenderDomain.js';
 
 describe('EventVerifierRouter', async function () {
   const { viem } = await network.connect();
@@ -28,6 +27,7 @@ describe('EventVerifierRouter', async function () {
   // Hashi infra
   const hashi = await viem.deployContract('HashiTest');
   const msgShoyuBashi = await viem.deployContract('ShoyuBashiTest', [owner, hashi.address]);
+  const senderRouter = await viem.deployContract('HashiMessageSenderRouter', [owner]);
   const lcShoyuBashi = await viem.deployContract('ShoyuBashiTest', [owner, hashi.address]);
 
   // Router verification
@@ -51,19 +51,14 @@ describe('EventVerifierRouter', async function () {
   ];
   assert.equal(adapters.length, reporters.length);
   await msgShoyuBashi.write.enableAdapters([10n, adapters.map((a) => a.address), 2n]);
-  await msgShoyuBashi.write.enableAdapters([
-    calcHashiSenderDomain({ domain: 10n }),
-    ['0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef'],
-    1n,
-  ]);
+  await senderRouter.write.setDomainSender([10n, '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef']);
    // Relay sender from 4321
   await msgShoyuBashi.write.enableAdapters([4321n, adapters.map((a) => a.address), 2n]);
-  await msgShoyuBashi.write.enableAdapters([
-    calcHashiSenderDomain({ domain: 4321n }),
-    ['0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef'],
-    1n,
+  await senderRouter.write.setDomainSender([4321n, '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef']);
+  const messageVerifier = await viem.deployContract('HashiMessageEventVerifier', [
+    msgShoyuBashi.address,
+    senderRouter.address,
   ]);
-  const messageVerifier = await viem.deployContract('HashiMessageEventVerifier', [msgShoyuBashi.address]);
 
   // Self verification [#200]
   const selfVerifier = await viem.deployContract('SelfEventVerifierTest', []);
