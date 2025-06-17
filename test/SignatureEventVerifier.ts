@@ -1,0 +1,47 @@
+import { describe, it } from 'node:test';
+
+import { network } from 'hardhat';
+
+import { encodeSignatureProof } from './lib/encodeSignatureProof.js';
+import { EVENT_PRIMARY_TYPE, EVENT_TYPES } from './lib/eventTypes.js';
+import { EVENT_SIGNATURE_DOMAIN } from './lib/eventSignatureDomain.js';
+
+describe('SignatureEventVerifier', async function () {
+  const { viem } = await network.connect();
+  const [signerClient] = await viem.getWalletClients();
+
+  const verifier = await viem.deployContract('SignatureEventVerifier', [
+    signerClient.account.address, // signer
+  ]);
+
+  it('Should encode receipt proof', async function () {
+    const chain = 1337n;
+    const emitter = '0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef';
+    const topics = [
+      '0x0101010101010101010101010101010101010101010101010101010101010101',
+      '0x2020202020202020202020202020202020202020202020202020202020202020',
+    ] as const;
+    const data = '0xabcdef0000000011110000000000000440000000000000000058000000000000181000000542';
+
+    const signature = await signerClient.signTypedData({
+      types: EVENT_TYPES,
+      primaryType: EVENT_PRIMARY_TYPE,
+      domain: EVENT_SIGNATURE_DOMAIN,
+      message: {
+        chain,
+        emitter,
+        topics,
+        data,
+      },
+    });
+    const proof = encodeSignatureProof({ signature });
+
+    await verifier.read.verifyEvent([
+      chain,
+      emitter,
+      topics,
+      data,
+      proof,
+    ]);
+  });
+});
