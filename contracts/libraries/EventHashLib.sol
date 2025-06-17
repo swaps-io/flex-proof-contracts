@@ -12,7 +12,14 @@ library EventHashLib {
         bytes32[] memory topics_,
         bytes memory data_
     ) internal pure returns (bytes32 hash) {
-        assembly { hash := keccak256(add(topics_, 32), mul(mload(topics_), 32)) }
-        hash = keccak256(abi.encode(EVENT_TYPE_HASH, chain_, emitter_, hash, keccak256(data_)));
+        assembly ("memory-safe") {
+            let ptr := mload(0x40)
+            mstore(ptr, EVENT_TYPE_HASH)
+            mstore(add(ptr, 0x20), chain_)
+            mstore(add(ptr, 0x40), emitter_)
+            mstore(add(ptr, 0x60), keccak256(add(topics_, 0x20), mul(mload(topics_), 0x20)))
+            mstore(add(ptr, 0x80), keccak256(add(data_, 0x20), mload(data_)))
+            hash := keccak256(ptr, 0xa0)
+        }
     }
 }
